@@ -1,0 +1,62 @@
+func encodeAsLineProtocol(runid string, label string, targetFieldValue string) {
+
+	ts := time.Now().UnixNano()
+	tsmp := strconv.FormatInt(ts, 10)
+	//tagOne := "uuid=" + uuid
+	tags := "runid=" + runid
+
+	//tags := tagOne + "," + tagTwo
+
+	lineProtocolTemplate := "{{measurement}},{{tags}} {{value}} {{timestamp}}"
+
+	i := strings.Replace(lineProtocolTemplate, "{{measurement}}", label, 1)
+	i = strings.Replace(i, "{{tags}}", tags, 1)
+	i = strings.Replace(i, "{{value}}", "value="+targetFieldValue, 1)
+	i = strings.Replace(i, "{{timestamp}}", tsmp, 1)
+
+	fmt.Println("Got :", i)
+
+	sendToInflux(i)
+
+}
+
+func sendToInflux(i string) bool {
+
+	httpError := false
+
+	node := "influx node name"
+	influxDB := "gotest"
+	influxUsername := "root"
+	influxPassword := "root"
+
+	url := fmt.Sprintf("http://%s:8086/write?db=%s&u=%s&p=%s", node, influxDB, influxUsername, influxPassword)
+	req, _ := http.NewRequest("POST", url, strings.NewReader(i))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		httpError = true
+	}
+	defer resp.Body.Close()
+
+	responseStatusCode := resp.StatusCode
+
+	//fmt.Println("response code:", responseStatusCode)
+
+	if httpError {
+		log.Println("[INFO] Message Not sent", err)
+	}
+
+	if responseStatusCode == 204 {
+		log.Println("[INFO] POSTed to influx OK. Got 204.")
+	} else {
+		log.Println("[INFO] Got error: ", responseStatusCode, " =>> Please investigate")
+	}
+
+	if httpError {
+		return false
+	}
+
+	return true
+
+}
