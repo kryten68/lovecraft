@@ -12,18 +12,18 @@ func getFormattedTimeFromEpochMillis(z int64, zone string, style int) string {
 	timeInZone := unixTime.In(timeZoneLocation)
 
 	switch style {
-	case 1:
-		timeInZoneStyleOne := timeInZone.Format("Mon Jan 2 15:04:05")
-		//Mon Aug 14 13:36:02
-		return timeInZoneStyleOne
-	case 2:
-		timeInZoneStyleTwo := timeInZone.Format("02-01-2006 15:04:05")
-		//14-08-2017 13:36:02
-		return timeInZoneStyleTwo
-	case 3:
-		timeInZoneStyleThree := timeInZone.Format("2006-02-01 15:04:05")
-		//2017-14-08 13:36:02
-		return timeInZoneStyleThree
-	}
+		case 1:
+			timeInZoneStyleOne := timeInZone.Format("Mon Jan 2 15:04:05")
+			//Mon Aug 14 13:36:02
+			return timeInZoneStyleOne
+		case 2:
+			timeInZoneStyleTwo := timeInZone.Format("02-01-2006 15:04:05")
+			//14-08-2017 13:36:02
+			return timeInZoneStyleTwo
+		case 3:
+			timeInZoneStyleThree := timeInZone.Format("2006-02-01 15:04:05")
+			//2017-14-08 13:36:02
+			return timeInZoneStyleThree
+		}
 	return x
 }
