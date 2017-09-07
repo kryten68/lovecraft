@@ -4,7 +4,7 @@
 input {
 
 	file {
-     	path => "C:/ELK/testlog.log"
+     	path => "C:/ELK/samplelog.log"
     	start_position => "beginning"
     	sincedb_path => "C:/ELK/.sincedb"
     	ignore_older => 0
