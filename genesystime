@@ -10,24 +10,13 @@ require "time"
 # It is only intended to be used as an .
 class LogStash::Filters::Genesystime < LogStash::Filters::Base
 
-  # Setting the config_name here is required. This is how you
-  # configure this filter from your Logstash config.
-  #
-  # filter {
-  #    {
-  #     message => "My message..."
-  #   }
-  # }
-  #
-  config_name "genesystime"
-  
+  config_name "genesystime" 
   
   #config :active, :validate => :boolean, :required => true, :default => true
   config :path_or_source, :validate => :string, :required => false, :default => "path"
   
   ## -- Global variables required for this plugin
   
-
   public
   def register
     # Add instance variables 
@@ -196,15 +185,7 @@ class LogStash::Filters::Genesystime < LogStash::Filters::Base
         @@running_date[currentDateKey] = checkpointDate
         event["genesysTime"] = @@running_date[currentDateKey] + " " + @@running_time[currentTimeKey]
     end
-    ## -- End
-
-    ## -- Part 8
-    ## -- Synopsis:
-    ## -- Catch any logfilestartdate events which are nil. These timestamps are incorrect
-    if @@running_date[logFileStartKey] == nil
-      event["logFileStartDate"] = "notFound"
-    end
-    ## -- End
+    ## -- End   
 
 
     # filter_matched should go in the last line of our successful code
