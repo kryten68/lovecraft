@@ -1,0 +1,215 @@
+# encoding: utf-8
+require "logstash/filters/base"
+require "logstash/namespace"
+require "date"
+require "time"
+
+# This  filter will replace the contents of the default 
+# message field with whatever you specify in the configuration.
+#
+# It is only intended to be used as an .
+class LogStash::Filters::Genesystime < LogStash::Filters::Base
+
+  # Setting the config_name here is required. This is how you
+  # configure this filter from your Logstash config.
+  #
+  # filter {
+  #    {
+  #     message => "My message..."
+  #   }
+  # }
+  #
+  config_name "genesystime"
+  
+  
+  #config :active, :validate => :boolean, :required => true, :default => true
+  config :path_or_source, :validate => :string, :required => false, :default => "path"
+  
+  ## -- Global variables required for this plugin
+  
+
+  public
+  def register
+    # Add instance variables 
+    @@running_date = Hash.new
+    @@running_time = Hash.new  
+  end # def register
+
+  public
+  def filter(event)
+
+    ## -- Part 1.
+    ## -- Synopsis:
+    ## -- [1] Get the unique log name from the path. Save this as variable: "thisApp"
+    ## -- [2] Create variable: "currentDateKey" linked to thisApp                           
+    ## -- [3] Create variable: "currentTimeKey" linked to thisApp
+    ## -- [4] Add key to @@running_date for the "currentDateKey"
+    ## -- [5] Add key to @@running_time for the "currentTimeKey"
+    ## -- [6] Add test fields to show their value ####TESTING####
+    #if event["path"] != nil
+    if event["path"] != nil    
+        match = /.*\/(?<app>.*(?=\.log))/.match(event["path"])
+        thisApp = match["app"]
+        thisApp = thisApp.gsub("_","")
+        thisApp = thisApp.gsub(".","")
+        currentDateKey    = thisApp + "--currentDate"
+        currentTimeKey    = thisApp + "--currentTime"
+        previousTimeKey   = thisApp + "--previousTime"
+        logFileStartKey   = thisApp + "--logFileStart"
+    end
+    ## -- End part 1.
+
+    ## -- Part 2
+    ## -- Synopsis:
+    ## -- Test if this is the start of log "Local Time" event used to initialise the start time and date
+    ## -- If so, initialise relevant keys.
+    if event["message"] =~ /^Local\stime\:.*\d{,4}\-\d{,2}\-\d{,2}.*/
+        # Get the start date and use it to update the unique key
+        start_date = /\d{,4}\-\d{,2}\-\d{,2}/.match(event["message"]).to_s
+        @@running_date[currentDateKey] = start_date
+
+        # Add the logFileStartDate to the running date map
+        @@running_date[logFileStartKey] = start_date
+
+        # Set the current event time from the time enclosed in this event
+        start_time = /\d{2}\:\d{2}\:\d{2}\.\d{3}/.match(event["message"]).to_s
+        @@running_time[currentTimeKey] = start_time
+
+        genesys_time = start_date + " " + start_time
+        event["genesysTime"] = genesys_time
+    end
+    ## -- End part 2.
+
+
+    ## -- Part 3
+    ## -- Synopsis:
+    ## -- Add the logfile start date and time to all events
+    event["logFileStartDate"] = @@running_date[logFileStartKey]
+    ## -- End part 3.
+
+    ## -- Part 4
+    ## -- Synopsis:
+    ## -- Test if the current event begins with a timestamp. If so save it to variable: genesys_time
+     if event["message"] =~ /^@?\d{,2}\:\d{,2}\:\d{,2}\.\d{,4}/
+        genesys_time = /^@?\d{,2}\:\d{,2}\:\d{,2}\.\d{,4}/.match(event["message"]).to_s.sub("@","")
+
+        ## -- Save current value of current time to previous event time
+        ## -- This is the timestamp of the previous event.
+        if @@running_time[currentTimeKey] != nil 
+            @@running_time[previousTimeKey] = @@running_time[currentTimeKey]
+        end
+
+        ## -- Save current event time from the event as the current event time.
+        ## -- This is the timestamp of the current event.
+        if genesys_time != nil
+            @@running_time[currentTimeKey] = genesys_time
+        end
+    end
+    ## -- End Part 4.
+
+    ## -- Part 5.
+    ## -- Synopsis:
+    ## -- Trim the values of previoustimekey and currenttimekey to three decimals to ensure accurate comparisons
+    ## -- Get the previous event time and trim to three decimals
+    if @@running_time[previousTimeKey] != nil
+        @@running_time[previousTimeKey] = @@running_time[previousTimeKey][0..11]
+        prevtime = @@running_time[previousTimeKey]
+        event["previousTime"] = @@running_time[previousTimeKey]
+    end
+
+    ## -- Get the current event time and trim to three decimals
+    if @@running_time[currentTimeKey] != nil
+        @@running_time[currentTimeKey] = @@running_time[currentTimeKey][0..11]
+        currtime =  @@running_time[currentTimeKey]
+        event["currentTime"] = @@running_time[currentTimeKey]
+    end
+
+    ## -- Convert the previous event time to a time format
+    if prevtime != nil 
+        pt1 = Time.parse prevtime
+    end
+    ## -- Convert the current event time to a time format
+    if currtime != nil
+        ct1 = Time.parse currtime
+    end
+    ## -- End Part 5.
+
+    ## -- Part 6.
+    ## -- Synopsis:
+    ## -- If the current event time is less than or equal to the previous event time then move the date forward and update the map
+    if pt1 != nil && ct1 != nil
+
+        if pt1 < ct1 
+            #event["genesysTime"] = @@running_date[currentDateKey] + " " + @@running_time[currentTimeKey]
+            if @@running_date[currentDateKey] != nil && @@running_time[currentTimeKey] != nil                
+                event["genesysTime"] = @@running_date[currentDateKey] + " " + @@running_time[currentTimeKey]
+
+                event["prevtime"] = prevtime
+                event["currtime"] = currtime
+                event["previous_is_older"] = "true"
+            end
+        end
+
+        if pt1 == ct1
+            #event["genesysTime"] = @@running_date[currentDateKey] + " " + @@running_time[currentTimeKey]
+            if @@running_date[currentDateKey] != nil && @@running_time[currentTimeKey] != nil                
+                event["genesysTime"] = @@running_date[currentDateKey] + " " + @@running_time[currentTimeKey]
+
+                event["prevtime"] = prevtime
+                event["currtime"] = currtime
+                event["previous_is_older"] = "they_are_same"
+            end
+        end
+
+        if pt1 > ct1
+            ## In this case the date must have moved forward by one.
+            if @@running_date[currentDateKey] != nil
+                c1 = Date.parse @@running_date[currentDateKey]
+                c2 = c1.next_day(1)
+                c3 = c2.strftime("%Y-%m-%d")
+                event["genesysTime"] = c3 + " " + @@running_time[currentTimeKey]
+                @@running_date[currentDateKey] = c3
+
+                event["prevtime"] = prevtime
+                event["currtime"] = currtime
+                event["current_is_older"] = "true"
+            end
+        end
+
+    end
+    ## -- End Part 6.
+
+
+    ## -- Part 7
+    ## -- Synopsis:
+    ## -- Test if the current event is a Check point timestamp.
+    ## -- If so, we can use this to update the value of @@running_date[currentDateKey]
+    ## -- Note that this check MUST happen AFTER any date adjustments made by the time comparison block
+    ## -- Otherwise the date could be moved forward by this block, then again by the time comparison block.
+    ## -- This check should happen last.
+    ## -- Note that the Genesys "Check Point" provided date is unlikely to be incorrect, so by updating the
+    ## -- @@running_date["currentdate"] value with the checkpoint, ensures that the date is correct for subsequent
+    ## -- messages.
+    if event["message"] =~ /Trc.*Check\spoint/
+        checkpointDate = start_time = /\d{4}\-\d{2}\-\d{2}/.match(event["message"]).to_s
+        event["checkpointdate"] = checkpointDate
+        @@running_date[currentDateKey] = checkpointDate
+        event["genesysTime"] = @@running_date[currentDateKey] + " " + @@running_time[currentTimeKey]
+    end
+    ## -- End
+
+    ## -- Part 8
+    ## -- Synopsis:
+    ## -- Catch any logfilestartdate events which are nil. These timestamps are incorrect
+    if @@running_date[logFileStartKey] == nil
+      event["logFileStartDate"] = "notFound"
+    end
+    ## -- End
+
+
+    # filter_matched should go in the last line of our successful code
+    filter_matched(event)
+
+  end # def filter
+
+end # class LogStash::Filters::Genesystime
