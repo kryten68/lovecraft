@@ -1,0 +1,46 @@
+## Read in the test files containing the rollover events
+
+## Objective is to handle all rollovers
+input {
+
+	file {
+     	path => "C:/ELK/samplelog.log"
+    	start_position => "beginning"
+    	sincedb_path => "C:/ELK/.sincedb"
+    	ignore_older => 0
+
+    	codec => multiline {    		
+			pattern => "@?\d{2}\:\d{2}\:\d{2}\.\d{3,4}"
+			negate => "true"
+			what => "previous"
+		}
+	}	
+}
+
+filter {
+
+	if [message] =~ /^Local time:/ {
+		mutate { add_tag => "keep" }
+	}
+
+	if [message] =~ /^@?\d{2}\:\d{2}\:\d{2}\.\d{3,4}/ {
+		mutate { add_tag => "keep" }
+	}
+	
+	if "keep" not in [tags] { drop {} }
+
+	genesystime {}
+
+	date {
+		match => [ "genesysTime", "yyyy-MM-dd HH:mm:ss.SSS" ]
+		timezone => "Europe/London"
+		remove_field => ["@version","host","tags"]
+	}
+}
+
+
+output {
+	##-- For debug purposes only:
+	stdout { codec => rubydebug }
+
+}

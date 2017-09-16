@@ -1,0 +1,110 @@
+SIP Server, Version: 8.1.101.18 Compiled: Mar 14 2014 17:35:58
+Genesys Telecommunications Laboratories, Inc., Copyright 1991 - 2008
+
+Build with Genesys SIP Library 8.1.100.28
+Application name: RTG_PSIP_P01_01A
+Application type: TServer (1)
+Command line:     sip_server.exe -service TSrvSIP64 -l 7260@WN1CF01A;7260@WN1CF01B -nco exit -app RTG_PSIP_P01_01A -host WN1CF01A -port 2020 -sstart 
+Host name:        WN1RT73A
+DST:              TZ = 1, timeb = 1
+Time zone:        0, GMT Standard Time, GMT Daylight Time
+UTC time:         2017-09-05T22:57:48.922
+Local time:       2017-09-05T23:57:48.922
+Start time (UTC): 2017-08-28T14:53:56
+Running time:     8:08:03:52
+Host info:        Windows 6.1.7601, 2, Service Pack 1, 1.0, 0110, 3
+F
+HA Role: Primary
+
+23:57:48.922  -- created aTmParty 56975f0
+23:57:48.922  SetRole: Destination for 12030041.56975f0-7b1b790:1
+23:57:48.922  -- AddParty to 7b1b790: 12030041.56975f0-7b1b790:1
+23:57:48.922  -- new TSCP call leg 2
+23:57:48.922  -- call leg created leg_id=2
+23:57:48.922 CreateParty new internal: 12030041.56975f0-7b1b790:1
+23:57:48.922: Call 16790467 dn 12030041 SetPartyId 16814968
+23:57:48.922: $-SIP:CTI:PARTY_CREATED:646536:4949
+
+23:57:48.922: $+SIP:CTI:PARTY_STATE_CHANGED:646537:6323
+23:57:48.922: $-SIP:CTI:PARTY_STATE_CHANGED:646537:9
+
+23:57:48.922: $+SIP:CTI:PARTY_STATE_CHANGED:646538:6041
+23:57:48.922: ISCC tracking: set cofid location=PBX_RSIP_03;cofid=17171973
+23:57:48.922: Adding OtherTrunkName(231): done 
+@23:57:48.9220 [BSYNC] Trace: Send to backup (RTG_PSIP_P01_01B) [660]:
+message RequestSetCallInfo
+	AttributeUpdateRevision	66935
+	AttributeUserData	[355] 00 07 00 00..
+		'CallInfo'	'routed'		
+	AttributeConnID	057702a9dd537fdb
+@23:57:48.9220 [BSYNC] Trace: Sent
+23:57:48.922 ClearContext: party 12030041.56975f0-7b1b790:1
+23:57:48.922 +++ CIFace::Event +++
+  +++ Pre-event +++
+    Type EventRouteRequest
+	Flags: divert=0 hook=0 postCall=0 active=1 moveAll=1 callType=1 hideOtherPi=0 InternalOther=0
+  --- Pre-event ---
+@23:57:48.9220 [ISCC] Call object is created: c:057702a9dd537fdb,0000000007b1c320
+@23:57:48.9220 [ISCC] Call created:
+	+ c:057702a9dd537fdb,0000000007b1c320 @ m:0000000000000000,0000000000000000 p:0 i:010033c3 nw:0000000000000000 t:2
+@23:57:48.9220 [BSYNC] Trace: Send to backup (RTG_PSIP_P01_01B) [660]:
+message RequestSetCallInfo
+	AttributeUpdateRevision	66935
+	AttributeUserData	[355] 00 07 00 00..	
+	AttributeConnID	057702a9dd537fdb
+@23:57:48.9220 [BSYNC] Trace: Sent
+@23:57:48.9220 [0] 8.1.101.18 distribute call/party event: message EventCallCreated
+23:57:48.922 Int 04544 Interaction message "EventCallCreated" generated
+23:57:48.922 Trc 04542 EventCallCreated sent to [960] (0000002c REP_ICON_P01_02 10.244.129.252:56352)
+23:57:48.922 Int 04544 Interaction message "EventCallCreated" generated
+23:57:48.922 Trc 04542 EventCallCreated sent to [792] (00000010 GIR_ICON_P01 10.244.129.58:57378)
+@23:57:48.9220 [ISCC] Party added [ssp view]:
+	@ c:057702a9dd537fdb,0000000007b1c320 @ m:0000000000000000,0000000000000000,0000000000000000 p:2 i:010033c3 nw:00000000:0000000000000000 t:2
+	+ p:0000000005db4e00 @ c:057702a9dd537fdb,0000000007b1c320 r:1 t:1 s:1000c n:01225971563
+	  p:0000000005dbce00 @ c:057702a9dd537fdb,0000000007b1c320 r:2 t:0 s:0 n:12030041
+@23:57:48.9220 [ISCC] Party object is created: p:0000000000000000,0000000005db4e00 n:01225971563:
+@23:57:48.9220 [ISCC] Party added:
+	@ c:057702a9dd537fdb,0000000007b1c320 @ m:0000000000000000,0000000000000000 p:1 i:010033c3 nw:0000000000000000 t:2
+	+ p:0000000000000000,0000000005db4e00 @ c:057702a9dd537fdb,0000000007b1c320 r:1 ----- n:01225971563:
+@23:57:48.9220 [BSYNC] Trace: Send to backup (RTG_PSIP_P01_01B) [660]:
+message EventCallPartyState
+@23:57:48.9220 [BSYNC] Trace: Sent
+@23:57:48.9220 [0] 8.1.101.18 distribute call/party event: message EventCallPartyAdded
+23:57:48.922 Int 04544 Interaction message "EventCallPartyAdded" generated
+23:57:48.922 Trc 04542 EventCallPartyAdded sent to [960] (0000002c REP_ICON_P01_02 10.244.129.252:56352)
+23:57:48.922 Int 04544 Interaction message "EventCallPartyAdded" generated
+23:57:48.922 Trc 04542 EventCallPartyAdded sent to [792] (00000010 GIR_ICON_P01 10.244.129.58:57378)
+    SetDelivered: party 12030041.56975f0-7b1b790:1, cause Null
+     -- TellQueued
+     -- party_info 12030041.5dbce00 state change: from <Null> to <Queued>
+     -- aTmParty::SetBusinessType():12030041 unchanged
+@23:57:48.9220 [ISCC] Party added [ssp view]:
+	@ c:057702a9dd537fdb,0000000007b1c320 @ m:0000000000000000,0000000000000000,0000000000000000 p:2 i:010033c3 nw:00000000:0000000000000000 t:2
+	  p:0000000005db4e00 @ c:057702a9dd537fdb,0000000007b1c320 r:1 t:1 s:1000c n:01225971563
+	+ p:0000000005dbce00 @ c:057702a9dd537fdb,0000000007b1c320 r:2 t:0 s:9 n:12030041
+@23:57:48.9220 [ISCC] Party object is created: p:0000000000000000,0000000005dbce00 n:12030041:
+@23:57:48.9220 [ISCC] Party added:
+	@ c:057702a9dd537fdb,0000000007b1c320 @ m:0000000000000000,0000000000000000 p:2 i:010033c3 nw:0000000000000000 t:2
+	  p:0000000000000000,0000000005db4e00 @ c:057702a9dd537fdb,0000000007b1c320 r:1 ----- n:01225971563:
+	+ p:0000000000000000,0000000005dbce00 @ c:057702a9dd537fdb,0000000007b1c320 r:2 ----- n:12030041:
+@23:57:48.9220 [BSYNC] Trace: Send to backup (RTG_PSIP_P01_01B) [660]:
+message EventCallPartyState
+	AttributeDN	'12030041'
+	AttributePartyUUID	'04ICEJQ69P6FL492QT3F0C2F70002K4R'
+	AttributePartyID	457702a9dd53df90
+	AttributeConnID	057702a9dd537fdb
+@23:57:48.9220 [BSYNC] Trace: Sent
+@23:57:48.9220 [0] 8.1.101.18 distribute call/party event: message EventCallPartyAdded
+23:57:48.922 Int 04544 Interaction message "EventCallPartyAdded" generated
+23:57:48.922 Trc 04542 EventCallPartyAdded sent to [960] (0000002c REP_ICON_P01_02 10.244.129.252:56352)
+23:57:48.922 Int 04544 Interaction message "EventCallPartyAdded" generated
+23:57:48.922 Trc 04542 EventCallPartyAdded sent to [792] (00000010 GIR_ICON_P01 10.244.129.58:57378)
+    push_queue: 12030041 for 12030041
+@23:57:48.9220 [0] 8.1.101.18 distribute_event: message EventQueued
+@23:57:48.9220 Call [057702a9dd537fdb]: urid 00260556
+@23:57:48.9220 [BSYNC] Trace: Send to backup (RTG_PSIP_P01_01B) [660]:
+message RequestSetCallInfo
+	AttributeUpdateRevision	2491734
+	AttributeUserData	[2176] 00 41 00 00..
+	AttributeConnID	057702a9dd537fdb
+	@23:57:48.9220 [BSYNC] Trace: Sent

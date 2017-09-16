@@ -1,0 +1,50 @@
+package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+func main() {	
+	m := make(map[string]string)	
+	addToMap(m, "start_time","09:00:00.000")
+	addToMap(m, "end_time","10:00:00.000")
+	addToMap(m, "completed","11:00:00.000")
+	addToMap(m, "absolute","08:00:00.000")
+	listMap(m)		
+}
+
+
+func addToMap(m map[string]string, k string, v string) {
+	m[k] = v
+}
+
+
+func listMap(m map[string]string) {
+
+	var unsorted []string
+	//var before []string
+	var after []string
+	
+	fmt.Println("Printing map vals")
+	for k, v := range m {	
+		fmt.Println( "key:", k, " value:", v)
+		unsorted = append(unsorted, k)		
+	}
+	
+	fmt.Println("\nPrinting unsorted slice vals")
+	fmt.Println(unsorted)
+	
+	sort.Strings(unsorted)
+	
+	after = unsorted
+	fmt.Println("\nPrinting sorted slice vals")
+	fmt.Println(after)
+	
+	fmt.Println("\nPrinting sorted map")
+	
+	for _, val := range after {	
+        	fmt.Println(val + "\t" + m[val])	
+	}
+	
+}

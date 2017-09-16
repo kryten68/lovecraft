@@ -1,0 +1,41 @@
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+
+	a := animal{
+		name: "Chewie",
+		age: 1,
+		color: "brown",
+		hair: true,
+	}
+	a.speak("Squeak!")
+	
+	b := animal{
+		name: "Shep",
+		age: 3,
+		color: "black",
+		hair: true,	
+	}
+	b.speak("woof!")
+	
+	animal.speak(b,"meaoww")
+}
+
+type animal struct {
+	name string
+	age int
+	color string
+	hair bool
+}
+
+func (z animal) speak(noise string) {
+	fmt.Println("Animal name is :", z.name)
+	fmt.Println("Animal age is :", z.age)
+	fmt.Println("Animal color is :", z.color)
+	fmt.Println("Animal has hair?:", z.hair)
+	fmt.Println("Animal noise is:", noise)
+}

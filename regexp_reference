@@ -1,0 +1,49 @@
+package main
+
+import (
+	"fmt"
+	"regexp"
+)
+
+func main() {
+
+	re,_ := regexp.Compile("ood")
+	
+	str := "Looking for Mr Goodbar"
+	
+	fmt.Println(re.MatchString(str)	)
+	// true
+	
+	fmt.Println(re.FindString(str)	)
+	// ood
+	
+	pattern := "\\d+"
+	u := "Stell754252a"
+	
+	getMatch(pattern, u)
+	
+	pattern = `\w{3}\snorth\s\w{4}`
+	u = "The north pole"
+	getMatch(pattern, u)
+	
+	pattern = `[\[\]\"]`
+	u = `"[198]"`
+	replaceTokens(pattern, u)
+	
+	
+	
+}
+
+func getMatch(p string, v string) {
+
+	re,_ := regexp.Compile(p)
+	mt := re.FindString(v)
+	fmt.Println(mt)
+}
+
+func replaceTokens(p string, v string) {
+	re,_ :=regexp.Compile(p)
+	nt := re.ReplaceAllString(v,"")
+	fmt.Println(nt)
+
+}
