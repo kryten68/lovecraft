@@ -1,0 +1,6 @@
+{
+    "_source": ["uuid"],
+    "query" : {
+        "match_all": {}
+    }
+}

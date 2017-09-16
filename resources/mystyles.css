@@ -1,0 +1,82 @@
+/* Font Stuff */
+h1,h2,h3,h4,h5,h6 {
+    font-family: "Roboto";
+}
+h1 {
+    font-size: 3em;
+}
+h2 {
+    font-size: 2em;
+}
+h3 {
+    font-size: 1.8em;
+}
+h4 {
+    font-size: 1.6em;
+}
+h5,h6 {
+    font-size: 1.4em;
+}
+p {
+    font-family: "Roboto";
+    font-size: 1.2em;
+    line-height: 1.8em;
+}
+.white-text {
+    color: white;
+}
+.larger {
+    font-size: 1.3em;
+}
+.highlight-text {
+    color: #444444;
+}
+/* ==== */
+
+/* Background Stuff */
+.bg-grey {
+    background-color: #BBB8AF;
+}
+.bg-white {
+    background-color: #FFFFFF;
+}
+/* ==== */
+
+/* Padding and Margin Helpers */
+.pad-20 {
+    padding:20px;
+}
+.pad-30 {
+    padding:30px;
+}
+.margin-top-10 {
+    margin-top: 10px;
+}
+.margin-top-40 {
+    margin-top: 40px;
+}
+.margin-top-100 {
+    margin-top: 100px;
+}
+/* ==== */
+
+/* Rounding and Other Simple Styles */
+.slight-round {
+    border-radius: 3px;
+}
+.lighter {
+    background-color: #fdfdfd;
+    color: #222222;
+    padding: 12px;
+    font-size: 0.9em;
+    border-radius: 2px;
+    border-bottom: 1px #dddddd solid;
+}
+.fullwidth {
+    width: 100%;
+    padding: 12px;
+}
+.tableheader {
+    padding:12px;
+}
+/* ==== */
