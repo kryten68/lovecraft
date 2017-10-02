@@ -10,7 +10,7 @@ import (
 var tpl *template.Template
 
 func init() {
-	tpl = template.Must(template.ParseGlob("/Users/stuarthenderson/go/src/vid/templates/*"))
+	tpl = template.Must(template.ParseGlob("/templates/*"))
 }
 
 func main() {
@@ -28,8 +28,8 @@ func lookUpTransaction(w http.ResponseWriter, r *http.Request) {
 	val := string(t)
 	s := ""
 
-	if val == "shite" {
-		s = "Its NOT shite, its very good!"
+	if val == "testinput" {
+		s = "yep, got the test input"
 	} else {
 		s = "You supplied: " + val
 	}
