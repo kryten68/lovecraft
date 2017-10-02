@@ -1,0 +1,39 @@
+package main
+
+import (
+	"fmt"
+	"html/template"
+	"io/ioutil"
+	"net/http"
+)
+
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseGlob("/Users/stuarthenderson/go/src/vid/templates/*"))
+}
+
+func main() {
+	http.HandleFunc("/", index)
+	http.HandleFunc("/lookUpTransaction", lookUpTransaction)
+	http.ListenAndServe(":8080", nil)
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	tpl.ExecuteTemplate(w, "base.gohtml", nil)
+}
+
+func lookUpTransaction(w http.ResponseWriter, r *http.Request) {
+	t, _ := ioutil.ReadAll(r.Body)
+	val := string(t)
+	s := ""
+
+	if val == "shite" {
+		s = "Its NOT shite, its very good!"
+	} else {
+		s = "You supplied: " + val
+	}
+
+	fmt.Println(s)
+	fmt.Fprintln(w, s)
+}
