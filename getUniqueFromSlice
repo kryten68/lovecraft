@@ -1,0 +1,31 @@
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+		
+	sampleSlice := []string{ "blue", "green", "red", "blue", "yellow", "green", "blue", "white" }
+	fmt.Println(sampleSlice)
+	containerMap := make(map[string]bool)
+	//sortedMap := make(map[string]bool)
+	
+	for _,v := range sampleSlice {
+		
+		if !containerMap[v] {
+			fmt.Println("Adding: ",v)
+			containerMap[v] = true
+		} else {
+			fmt.Println("Not adding: ",v)
+		}		
+	}
+	
+	sampleSlice = []string{}
+	
+	for k,_ := range containerMap {
+		sampleSlice = append(sampleSlice, k)
+	}
+	
+	fmt.Println(sampleSlice)
+}
