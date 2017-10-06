@@ -5,14 +5,15 @@ import (
 )
 
 func main() {
-		
+	// Starting slice with dupes
 	sampleSlice := []string{ "blue", "green", "red", "blue", "yellow", "green", "blue", "white" }
 	fmt.Println(sampleSlice)
-	containerMap := make(map[string]bool)
-	//sortedMap := make(map[string]bool)
 	
-	for _,v := range sampleSlice {
-		
+	// Make a container map
+	containerMap := make(map[string]bool)
+	
+	// Iterate over slice adding to map if no key value already exists.
+	for _,v := range sampleSlice {		
 		if !containerMap[v] {
 			fmt.Println("Adding: ",v)
 			containerMap[v] = true
@@ -21,11 +22,12 @@ func main() {
 		}		
 	}
 	
+	// Now all items are in the map we flatten the slice
 	sampleSlice = []string{}
 	
+	// Iterate over the map and add the (now unique) keys to the slice
 	for k,_ := range containerMap {
 		sampleSlice = append(sampleSlice, k)
-	}
-	
+	}	
 	fmt.Println(sampleSlice)
 }
