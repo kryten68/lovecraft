@@ -1,0 +1,54 @@
+h1,h2,h3,h4,
+h5,h6,p {
+    font-family: "Bree Serif" !important;
+    color: #2b3643 !important;
+}
+
+body {
+    background-color: #2b3643 !important;
+}
+.mainarea {
+    background-color: #fff !important;
+    min-height: 1200px;
+    padding-left:28px;
+    padding-right: 28px;
+}
+.custom {
+    border-left: 5px solid #2b3643 !important;
+}
+
+.pad-10 {
+    padding:10px;
+}
+.pad-20 {
+    padding:20px;
+}
+
+.pad-30 {
+    padding:30px;
+}
+
+.pad-40 {
+    padding:40px;
+}
+
+.mar-10 {
+    margin: 10px;
+}
+
+.mainTitle {
+    font-size: 3.2em;
+}
+
+/* width settings */
+.wide-70 {
+    width: 70% !important;
+}
+
+#resultsTable {
+    display: none;
+}
+
+button.btn.btn-default.dropdown-toggle {
+    background-color: #eee;
+}
