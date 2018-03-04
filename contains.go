@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var temp = make(map[string]bool)
+
 func contains(candidate string) {
 	if temp[candidate] {
 		fmt.Println("true ", candidate)
@@ -11,8 +13,6 @@ func contains(candidate string) {
 		fmt.Println("false ", candidate)
 	}
 }
-
-var temp = make(map[string]bool)
 
 func main() {
 	sliceOne := []string{"52200", "53233", "54999", "52525"}
