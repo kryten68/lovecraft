@@ -1,0 +1,26 @@
+package main
+
+import (
+	"fmt"
+	"regexp"
+)
+
+func main() {
+
+	tt := "Legion for we are many"	
+	getMatch(tt,"ion for")	
+
+}
+
+func getMatch(s string, p string) string {
+
+	fmt.Println("String received: ", s)
+	fmt.Println("Pattern received: ", p)
+	
+	re,_ := regexp.Compile(p)	
+	matchedText := re.FindString(s)
+	
+	fmt.Println("Got: ",matchedText)
+	return matchedText
+}
+
