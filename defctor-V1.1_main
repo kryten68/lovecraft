@@ -1,0 +1,19 @@
+
+package main
+
+const (
+	csvSource = "F:\\Code\\go\\data\\fcm_july_all.csv"
+)
+
+var (
+	//csvDataSlice []string
+	jsonSlice []string
+)
+
+func main() {
+
+	csvDataSlice := SlurpFileIntoStringSlice(csvSource, "\r\n")
+	jSlice := ProcessSlice(csvDataSlice)
+	OutSlice(jSlice)
+
+}
