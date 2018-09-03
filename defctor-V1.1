@@ -1,0 +1,113 @@
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+// Application globals
+var (
+	parsedStart time.Time
+	parsedEndTime time.Time
+	defectDurationMins time.Time
+	defectDurationHours time.Time
+	defectDurationDays time.Time
+	totalDays float32
+	weekDays float32
+	businessDays int
+	weekendDays int
+	firstDay time.Time
+	endDay string
+)
+
+const (
+	// Required pattern for parsing dates and times
+	delta = "02/01/2006 15:04:05"
+
+	// Number of minutes in a full weekday
+	fullWeekDayNumMins = 600
+
+	// Number of minutes in a full weekend day
+	fullWeekendDayNumMins = 300
+
+	// Weekday start time
+	weekDayStartTime = time.Minute
+)
+
+func main() {
+
+	started := "07/08/2018 10:00:00"
+	ended   := "25/08/2018 10:00:00"
+
+	getDefectTotalTime(started,ended)
+
+	fmt.Println("The first day was:",firstDay)
+
+}
+
+func getDefectTotalTime(s,e string) {
+
+	parsedStart, err := time.Parse(delta,s)
+	errAlpha(err)
+	fmt.Println("Start time (parsed) is:", parsedStart)
+
+	parsedEnd, err := time.Parse(delta,e)
+	errAlpha(err)
+	fmt.Println("Ended time (parsed) is:", parsedEnd)
+	divider()
+
+	defectDurationMins := parsedEnd.Sub(parsedStart).Minutes()
+	defectDurationHours := parsedEnd.Sub(parsedStart).Hours()
+	defectDurationDays := parsedEnd.Sub(parsedStart).Hours() / 24
+
+	fmt.Println("Duration between start and end:", defectDurationMins, "minutes")
+	fmt.Println("Duration between start and end:", defectDurationHours, "hours")
+	fmt.Println("Duration between start and end:", defectDurationDays, "days")
+
+	CalcBusinessDays(parsedStart, parsedEnd)
+
+}
+
+func CalcBusinessDays(from time.Time, to time.Time)  {
+
+	totalDays := float32(to.Sub(from) / (24 * time.Hour))
+	divider()
+	fmt.Println("Total days inclusive: ",totalDays + 1)
+
+	weekDays := float32(from.Weekday()) - float32(to.Weekday())
+
+	businessDays := int(1 + (totalDays * 5 - weekDays*2) /7)
+	fmt.Println("Business days: ",businessDays)
+
+	if to.Weekday() == time.Saturday {
+		businessDays--
+	}
+	if from.Weekday() == time.Sunday {
+		businessDays--
+	}
+
+	weekendDays := (totalDays - float32(businessDays))+1
+
+	fmt.Print("Weekend days in this span:",weekendDays, "\r\n")
+	fmt.Println("Number of business days:", businessDays)
+	fmt.Println("Number of mins in full weekday:",fullWeekDayNumMins)
+	fmt.Println("Number of mins in full weekend day:",fullWeekendDayNumMins)
+	divider()
+
+	firstDay := from.Weekday()
+	fmt.Println("First day is:",firstDay)
+
+	endDay := to.Weekday()
+	fmt.Println("Last day is:",endDay)
+
+}
+
+func errAlpha(e error) {
+	if e != nil {
+		fmt.Println("Caught error: ", e)
+	}
+}
+
+func divider() {
+	fmt.Println("-------------------------------------------------")
+}
