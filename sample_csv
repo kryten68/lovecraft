@@ -1,0 +1,11 @@
+defect_id,summary,status,detected_date,severity,closing_date,root_cause,defect_start_time,defect_close_time
+10891,Blue | Outclearing |Rleease 3| validation failed for something.,Closed,01/07/2018,2-Major,02/07/2018,Incorrect Reference Data,01/07/2018 07:33:24,02/07/2018 09:53:29
+10892,Blue| Outclearing | Release 3| Iteration 2| validation failed for another thing,Closed,01/07/2018,2-Major,03/07/2018,Incorrect Reference Data,01/07/2018 07:36:11,02/07/2018 12:14:41
+10898,Green| data not present in DB.,Closed,01/07/2018,1-Showstopper,02/07/2018,Not a Defect,01/07/2018 15:16:20,02/07/2018 10:19:00
+10908,Silver | Outcleared | validation failed for something,Closed,02/07/2018,2-Major,03/07/2018,Not a Defect,02/07/2018 08:10:00,03/07/2018 03:45:00
+10910,Gold | Outcleared validation failed for xxx,Closed,02/07/2018,1-Showstopper,03/07/2018,Data issue,02/07/2018 08:26:00,03/07/2018 05:15:00
+10914,White validation failed for a thing.,Closed,02/07/2018,2-Major,02/08/2018,Incorrect Reference Data,02/07/2018 10:08:00,02/08/2018 11:12:00
+10916,Green,Closed,02/07/2018,2-Major,02/08/2018,Data Issues,02/07/2018 10:21:59,02/08/2018 14:43:00
+10917,Silver.,Closed,02/07/2018,2-Major,16/07/2018,Code,02/07/2018 10:27:07,16/07/2018 21:09:28
+10918,Gold,Closed,02/07/2018,2-Major,03/07/2018,Incorrect Data,02/07/2018 10:39:19,03/07/2018 10:55:00
+10919,White,Closed,02/07/2018,2-Major,02/08/2018,Incorrect Data in File,02/07/2018 10:48:28,02/08/2018 08:29:00
