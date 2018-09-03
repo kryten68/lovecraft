@@ -1,0 +1,114 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"strings"
+	"sjson"
+	)
+
+func SlurpFileIntoStringSlice(f,s string) []string {
+
+	// Reset the slice
+	var csvDataSlice []string
+
+	// File reader
+	d,e := ioutil.ReadFile(f)
+
+	// Check errors
+	Check(e)
+
+	// Convert slurp into a big string
+	dd := string(d)
+
+	// Split the big string on the splitter chars supplied
+	t := strings.Split(dd,s)
+
+	// Push the lines into the slice
+	for _,v := range t {
+		csvDataSlice = append(csvDataSlice,v)
+	}
+
+	// return the new slice
+	return csvDataSlice
+}
+
+func ProcessSlice(s []string) []string {
+
+	jsonSlice = nil
+
+	for _,l := range s {
+
+		lineData := strings.Split(l,",")
+
+		defectId 		:= lineData[0]
+		summary  		:= lineData[1]
+		status 			:= lineData[2]
+		detectedDate	:= lineData[3]
+		severity		:= lineData[4]
+		closeDate		:= lineData[5]
+		rootCause		:= lineData[6]
+		startDate		:= lineData[7]
+		endDate			:= lineData[8]
+
+
+		j := "{}"
+
+		summary = CheckForNull(summary)
+		j,e := sjson.Set(j,"summary", strings.ToLower(summary))
+		Check(e)
+
+		status = CheckForNull(status)
+		j,e = sjson.Set(j,"status", strings.ToLower(status))
+		Check(e)
+
+		detectedDate = CheckForNull(detectedDate)
+		j,e = sjson.Set(j,"detectedDate", strings.ToLower(detectedDate))
+		Check(e)
+
+		severity = CheckForNull(severity)
+		j,e = sjson.Set(j,"severity", strings.ToLower(severity))
+		Check(e)
+
+		closeDate = CheckForNull(closeDate)
+		j,e = sjson.Set(j,"closeDate", strings.ToLower(closeDate))
+		Check(e)
+
+		rootCause = CheckForNull(rootCause)
+		j,e = sjson.Set(j,"rootCause", strings.ToLower(rootCause))
+		Check(e)
+
+		defectId = CheckForNull(defectId)
+		j, e = sjson.Set(j, "defectId", strings.ToLower(defectId))
+		Check(e)
+
+		endDate = CheckForNull(endDate)
+		j,e = sjson.Set(j,"endDate", strings.ToLower(endDate))
+		Check(e)
+
+		startDate = CheckForNull(startDate)
+		j,e = sjson.Set(j,"startDate", strings.ToLower(startDate))
+		Check(e)
+
+		jsonSlice = append(jsonSlice,j)
+
+	}
+
+	return jsonSlice
+
+}
+
+func CheckForNull(s string) string {
+	if s == "" { s = "nil" }
+	return s
+}
+
+func Out(s string) { fmt.Println(s) }
+
+func OutSlice(s []string) {
+	for i,v := range s {
+		fmt.Println("Index:",i,"Value:",v)
+	}
+}
+
+func Check(e error) { if e != nil { fmt.Println("ERROR: ",e) } }
