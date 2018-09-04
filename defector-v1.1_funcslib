@@ -5,7 +5,66 @@ import (
 	"io/ioutil"
 	"strings"
 	"sjson"
-	)
+	"gjson"
+	"time"
+	"math"
+)
+
+
+func GetSliceOfDatesForDefectDuration(j []string) {
+
+	for _,v := range j {
+		s := ConvertToDateTime(gjson.Get(v,"startDate").String())
+		e := ConvertToDateTime(gjson.Get(v,"endDate").String())
+
+		fmt.Println("Start datetime:", s)
+		fmt.Println("End datetime", e)
+	}
+
+}
+
+func CalcTotalMinsInDefectDuration(j []string) {
+
+	for _,v := range j {
+
+		s := gjson.Get(v, "startDate").String()
+		y1 := ConvertToDateTime(s)
+		fmt.Println("Start time:", y1)
+		fmt.Println("Day of week", y1.Weekday())
+
+		e := gjson.Get(v,"endDate").String()
+		y2 := ConvertToDateTime(e)
+		fmt.Println("End time:", y2)
+		fmt.Println("Day of week", y2.Weekday())
+
+		mins := y2.Sub(y1).Minutes()
+		minsRounded := math.Floor(mins*100) / 100
+		if minsRounded < 1 { minsRounded = 00.00 }
+
+		hours := minsRounded / 60
+		hoursRounded := math.Floor(hours*100) / 100
+		if hoursRounded < 1 { hoursRounded = 00.00 }
+
+		days := hoursRounded / 24
+		daysRounded := math.Floor(days*100) / 100
+		if daysRounded < 1 { daysRounded = 00.00 }
+
+		fmt.Println("Minutes:", minsRounded)
+		fmt.Println("Hours:", hoursRounded)
+		fmt.Println("Days:", daysRounded)
+		fmt.Println("-----------------------")
+
+	}
+
+}
+
+func ConvertToDateTime(d string) time.Time {
+
+	layout := "02/01/2006 15:04:05"
+	t,_ := time.Parse(layout,d)
+	return t
+
+}
 
 func SlurpFileIntoStringSlice(f,s string) []string {
 
