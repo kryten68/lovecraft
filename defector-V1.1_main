@@ -1,8 +1,7 @@
-
 package main
 
 const (
-	csvSource = "F:\\Code\\go\\data\\fcm_july_all.csv"
+	csvSource = "E:\\go-code\\data\\data.csv"
 )
 
 var (
@@ -15,5 +14,8 @@ func main() {
 	csvDataSlice := SlurpFileIntoStringSlice(csvSource, "\r\n")
 	jSlice := ProcessSlice(csvDataSlice)
 	OutSlice(jSlice)
+
+	CalcTotalMinsInDefectDuration(jSlice)
+	GetSliceOfDatesForDefectDuration(jSlice)
 
 }
