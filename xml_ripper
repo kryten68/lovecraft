@@ -1,0 +1,110 @@
+<#  -- Author: shenderson
+    -- Synposis:
+    --      Reads the XML file then
+    --      Extracts all the useful values then
+    --      Generated a powershell custom object for each datapoint entity then
+    --      Converts each object to Json then
+    --      Well.. its json: do whatever you like
+#>
+
+Clear-Host
+
+## Define the class used to build the PSObjects:
+Class datapoint {
+    [string]$model
+    [string]$name 
+    [string]$type
+    [string]$nativetype
+    [boolean]$isnull    
+    [boolean]$updateable
+}
+
+## Functions
+
+function convert_object_to_json($extracted_datapoint) {
+    $json = $extracted_datapoint | ConvertTo-Json -Compress
+    $json | print
+}
+
+
+function extract_and_generate_datapoints($xml_content){
+
+    foreach ($entry in $xml_content) {
+
+        $not_null = $false
+
+        ## -- Collect and update the data model. This is needed as a property on subsequent datapoints
+        if ($entry -match "<model name\=.*\>") {
+            $script:current_model = [regex]::Match($entry,'(?<=name\=\")\w*(?=\")').value
+           # $script:current_model | print
+        }
+        
+        if ($entry -match "OPTIONS") {
+            $entry = $entry `
+                -Replace " ","," `
+                -Replace "OPTIONS\(","" `
+                -Replace ",$","" `
+                -Replace "\)$","" `
+                -Replace "'","" `
+                -Replace "`t"
+                
+        }
+        
+        if ($entry -match "NOT,NULL") {
+            $entry = $entry -Replace "NOT,NULL",""
+            $not_null = $true        
+        }
+
+        if ($entry -match "nvarchar,max") {
+            $entry = $entry -Replace "nvarchar,max","nvarchar(max)"
+        }
+
+        if ($entry -match ",,") { $entry = $entry -Replace ",,","," }
+
+        $arr = $entry -Split ","        
+        $dp = [datapoint]::new()
+
+        $dp.model = $current_model
+        $dp.isnull = $not_null
+        $dp.name = $arr[0]
+        $dp.type = $arr[1]
+
+        if ($arr[2] -match "NATIVE_TYPE") {
+            $dp.nativetype = $arr[3]
+        }
+        if ($arr[2] -match "UPDATABLE") {
+            $dp.updateable = $arr[3]
+        }
+
+        if ($arr[4] -match "UPDATABLE") {
+            $dp.updateable = $arr[5]
+        }
+
+        if (-not $dp.nativetype ) {
+            $dp.nativetype = "unset"
+        }
+        if (-not $dp.updateable ) {
+            $dp.updateable = "unset"
+        }
+
+        ## -- Print the completed PSObject
+        #$dp | print
+
+        ## -- Send the PSObject for conversion to Json and output to console
+        convert_object_to_json($dp)
+    }
+}
+
+
+## -- START HERE
+## Define some globals:
+Set-Alias -name print -Value Out-Host
+$xml_file_path = "G:\scratch\blob.xml"
+[string]$script:current_model
+$xml_content = Get-Content -Path $xml_file_path | where-Object { 
+    $_ -match "^`t" -and `
+    $_ -match "OPTIONS" -or `
+    $_ -match "\<model\sname\=.*\>"
+}
+
+extract_and_generate_datapoints($xml_content)
