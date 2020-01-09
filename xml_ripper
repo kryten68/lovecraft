@@ -11,34 +11,97 @@ Clear-Host
 
 ## Define the class used to build the PSObjects:
 Class datapoint {
+    [string]$vdb_name
+    [string]$vdb_version
+    [string]$validation_date_time
+    [String]$validation_version
     [string]$model
-    [string]$name 
+    [string]$entity_type
+    [string]$entity_name
+    [string]$name
     [string]$type
     [string]$nativetype
-    [boolean]$isnull    
+    [boolean]$isnull
     [boolean]$updateable
 }
 
 ## Functions
+function post_to_elastic($json) {
+
+    "Posting to elastic index:  $script:es_data_node" | print
+
+    $response = Invoke-RestMethod `
+        -Uri $script:es_data_node `
+        -Method Post `
+        -Headers $headers `
+        -Body $json
+
+    "Response: $($response.result)" | print
+    start-sleep -Milliseconds 100
+
+}
 
 function convert_object_to_json($extracted_datapoint) {
     $json = $extracted_datapoint | ConvertTo-Json -Compress
     $json | print
+
+    if ($send_to_output -match "elastic") {
+        "Preparing to post to elastic..." | print
+        post_to_elastic($json)
+    }
+    if ($send_to_output -match "file") {
+        "Writing to file: $($output_file_destination)" | print
+        $json + "," | out-file -FilePath $output_file_destination -Append -Encoding "ASCII"
+    }
+    if ($send_to_output -match "console") {
+        $json | print
+    }
+
 }
 
-
 function extract_and_generate_datapoints($xml_content){
+
+    ## -- If file output selected open the json array in the target file:
+    if ( $send_to_output -Match "file") {
+        "[" | out-file -FilePath $output_file_destination -Append -Encoding "Ascii"
+    }
 
     foreach ($entry in $xml_content) {
 
         $not_null = $false
 
-        ## -- Collect and update the data model. This is needed as a property on subsequent datapoints
+        ## -- Collect or update the data model. This is needed as a property on subsequent datapoints
         if ($entry -match "<model name\=.*\>") {
             $script:current_model = [regex]::Match($entry,'(?<=name\=\")\w*(?=\")').value
-           # $script:current_model | print
+            # $script:current_model | print
         }
-        
+
+        ## -- Collect or update the vdb name.
+        if ($entry -match "\<vdb name\=") {
+            $script:vdb_name = [regex]::Match($entry,'(?<=name\=\")\w*(?=\")').value
+            $script:vdb_version = [regex]::Match($entry, '(?<=version\=\").*(?=\")').value
+        }
+
+        ## -- Collect or update the validation date, time and version.
+        if ($entry -match "validationDateTime") {
+            $script:validation_date_time = [regex]::Match($entry,'(?<=value\=\").*(?=\")').value
+        }
+        if ($entry -match "validationVersion") {
+            $script:validation_version = [regex]::Match($entry,'(?<=value\=\").*(?=\")').value
+        }
+
+        ## -- Collect or update the VDB entity to which these data points belong
+        if ($entry -match "^CREATE\s[VIEW|FOREIGN]") {
+            if ($entry -match "^CREATE\sVIEW") {
+                $script:entity_name = [regex]::Match($entry,'(?<=VIEW\s)\S*').value
+                $script:entity_type = "view"
+            }
+            if ($entry -match "^CREATE\sFOREIGN\sTABLE") {
+                $script:entity_name = [regex]::Match($entry,'(?<=TABLE\s)\S*').value
+                $script:entity_type = "foreign-table"
+            }
+        }
+
         if ($entry -match "OPTIONS") {
             $entry = $entry `
                 -Replace " ","," `
@@ -47,12 +110,11 @@ function extract_and_generate_datapoints($xml_content){
                 -Replace "\)$","" `
                 -Replace "'","" `
                 -Replace "`t"
-                
         }
-        
+
         if ($entry -match "NOT,NULL") {
             $entry = $entry -Replace "NOT,NULL",""
-            $not_null = $true        
+            $not_null = $true
         }
 
         if ($entry -match "nvarchar,max") {
@@ -61,50 +123,70 @@ function extract_and_generate_datapoints($xml_content){
 
         if ($entry -match ",,") { $entry = $entry -Replace ",,","," }
 
-        $arr = $entry -Split ","        
+        $arr = $entry -Split ","
         $dp = [datapoint]::new()
 
-        $dp.model = $current_model
+        $dp.model = $script:current_model
+        $dp.vdb_name = $script:vdb_name
+        $dp.vdb_version = $script:vdb_version
+        $dp.validation_date_time = $script:validation_date_time
+        $dp.validation_version = $script:validation_version
+        $dp.entity_type = $script:entity_type
+        $dp.entity_name = $entity_name
         $dp.isnull = $not_null
-        $dp.name = $arr[0]
+        $dp.name = $arr[0] -Replace "\\","" -Replace '"',''
         $dp.type = $arr[1]
 
-        if ($arr[2] -match "NATIVE_TYPE") {
-            $dp.nativetype = $arr[3]
-        }
-        if ($arr[2] -match "UPDATABLE") {
-            $dp.updateable = $arr[3]
-        }
-
-        if ($arr[4] -match "UPDATABLE") {
-            $dp.updateable = $arr[5]
-        }
-
-        if (-not $dp.nativetype ) {
-            $dp.nativetype = "unset"
-        }
-        if (-not $dp.updateable ) {
-            $dp.updateable = "unset"
-        }
+        if ($arr[2] -match "NATIVE_TYPE") { $dp.nativetype = $arr[3] }
+        if ($arr[2] -match "UPDATABLE") { $dp.updateable = $arr[3] }
+        if ($arr[4] -match "UPDATABLE") { $dp.updateable = $arr[5] }
+        if (-not $dp.nativetype ) { $dp.nativetype = "unset" }
+        if (-not $dp.updateable ) { $dp.updateable = "unset" }
 
         ## -- Print the completed PSObject
         #$dp | print
 
         ## -- Send the PSObject for conversion to Json and output to console
-        convert_object_to_json($dp)
+        ## -- if an entity_type is set:
+        if ($dp.entity_type -ne "" -and `
+                $dp.name -notmatch "model\sname" -and `
+                $dp.name -notmatch "CREATE\s") {
+                    convert_object_to_json($dp)
+                }
+    }
+
+    ## -- If file output selected close the json array in the target file:
+    if ( $send_to_output -Match "file") {
+        "]" | out-file -FilePath $output_file_destination -Append -Encoding "Ascii"
     }
 }
-
 
 ## -- START HERE
 ## Define some globals:
 Set-Alias -name print -Value Out-Host
-$xml_file_path = "G:\scratch\blob.xml"
+$xml_file_path = "C:\scratch\blob.xml"
+$output_file_destination = "C:\scratch\output.json"
 [string]$script:current_model
-$xml_content = Get-Content -Path $xml_file_path | where-Object { 
+
+## -- IMPORTANT
+## -- Switch variable to control whether this data will be sent to Elastic
+## -- Possible options are "elastic", "file" or "console"
+$send_to_output = "file"
+
+## -- Prepare the elasticsearch index name and host ( used or not )
+$index_name = "d4a/_doc/" # + (Get-Date).tostring("MM-dd-yyyy")
+$es_data_node = "http://localhost:9200/" + $index_name
+$headers = @{'content-type'='application/json'}
+
+
+$xml_content = Get-Content -Path $xml_file_path | where-Object {
     $_ -match "^`t" -and `
     $_ -match "OPTIONS" -or `
-    $_ -match "\<model\sname\=.*\>"
+    $_ -match 'validationDateTime\"' -or `
+    $_ -match 'validationVersion\"' -or `
+    $_ -match "\<model\sname\=.*\>" -or `
+    $_ -match "\<vdb\sname.*" -or `
+    $_ -match "^CREATE\s[VIEW|FOREIGN]"
 }
 
 extract_and_generate_datapoints($xml_content)
